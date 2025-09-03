@@ -10,3 +10,45 @@
 export interface DemoResponse {
   message: string;
 }
+
+export interface TimePoint {
+  t: number;
+  total: number;
+  success: number;
+  failed: number;
+  avg: number;
+  p95: number;
+}
+
+export interface ProxyStat {
+  proxy: string;
+  success: number;
+  failure: number;
+  avgResponse: number;
+  health: number;
+}
+
+export type Severity = "info" | "warning" | "critical";
+
+export interface AlertItem {
+  id: string;
+  type: string;
+  message: string;
+  severity: Severity;
+  timestamp: number;
+}
+
+export interface MetricsSummary {
+  total: number;
+  successRate: number;
+  avgResponseTime: number;
+  p95ResponseTime: number;
+  activeProxies: number;
+}
+
+export interface MetricsResponse {
+  summary: MetricsSummary;
+  series: TimePoint[];
+  proxies: ProxyStat[];
+  alerts: AlertItem[];
+}
