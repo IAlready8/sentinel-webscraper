@@ -114,7 +114,9 @@ function ScraperPanel() {
               <Button type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? "Scraping..." : "Scrape"}
               </Button>
-              <span className="text-sm text-foreground/60">Up to 10 URLs per run</span>
+              <span className="text-sm text-foreground/60">
+                Up to 10 URLs per run
+              </span>
             </div>
           </form>
         </CardContent>
@@ -130,10 +132,17 @@ function ScraperPanel() {
               {results.map((r) => (
                 <div key={r.url} className="rounded-lg border p-4">
                   <div className="flex items-center justify-between gap-4">
-                    <a href={r.url} target="_blank" rel="noreferrer" className="font-medium text-primary underline-offset-4 hover:underline break-all">
+                    <a
+                      href={r.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium text-primary underline-offset-4 hover:underline break-all"
+                    >
                       {r.title || r.url}
                     </a>
-                    <span className={`text-xs ${r.success ? "text-emerald-600" : "text-rose-600"}`}>
+                    <span
+                      className={`text-xs ${r.success ? "text-emerald-600" : "text-rose-600"}`}
+                    >
                       {r.success ? r.status : r.error}
                     </span>
                   </div>
@@ -145,11 +154,19 @@ function ScraperPanel() {
                   {r.links && r.links.length > 0 && (
                     <div className="mt-2 text-xs text-foreground/60">
                       {r.links.slice(0, 3).map((l) => (
-                        <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="mr-3 underline-offset-4 hover:underline">
+                        <a
+                          key={l.href}
+                          href={l.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mr-3 underline-offset-4 hover:underline"
+                        >
                           {new URL(l.href).hostname}
                         </a>
                       ))}
-                      {r.links.length > 3 && <span>+{r.links.length - 3} more</span>}
+                      {r.links.length > 3 && (
+                        <span>+{r.links.length - 3} more</span>
+                      )}
                     </div>
                   )}
                 </div>

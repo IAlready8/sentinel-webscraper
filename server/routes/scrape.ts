@@ -17,7 +17,8 @@ function stripTags(html: string): string {
 
 function extractMeta(html: string): Record<string, string> {
   const meta: Record<string, string> = {};
-  const regex = /<meta[^>]+(name|property)=["']?([^>"']+)["']?[^>]*content=["']([^"']*)["'][^>]*>/gi;
+  const regex =
+    /<meta[^>]+(name|property)=["']?([^>"']+)["']?[^>]*content=["']([^"']*)["'][^>]*>/gi;
   let m: RegExpExecArray | null;
   while ((m = regex.exec(html))) {
     meta[m[2]] = decodeHTMLEntities(m[3]);
@@ -25,7 +26,10 @@ function extractMeta(html: string): Record<string, string> {
   return meta;
 }
 
-function extractLinks(html: string, base: string): { href: string; text?: string }[] {
+function extractLinks(
+  html: string,
+  base: string,
+): { href: string; text?: string }[] {
   const links: { href: string; text?: string }[] = [];
   const regex = /<a\s+[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   let m: RegExpExecArray | null;
@@ -73,7 +77,15 @@ async function scrapeOne(url: string): Promise<ScrapeItem> {
     const text = stripTags(html).slice(0, 1200);
     const metadata = extractMeta(html);
     const links = extractLinks(html, url);
-    return { url, success: true, status, title, textPreview: text, metadata, links };
+    return {
+      url,
+      success: true,
+      status,
+      title,
+      textPreview: text,
+      metadata,
+      links,
+    };
   } catch (e: any) {
     return { url, success: false, error: e?.message ?? "fetch_error" };
   }
