@@ -92,14 +92,58 @@ async function scrapeOne(url: string): Promise<ScrapeItem> {
 }
 
 export const handleScrape: RequestHandler = async (req, res) => {
-  const body = req.body as ScrapeRequest;
-  const input = body?.urls?.length ? body.urls : body?.url ? [body.url] : [];
+  const body = req.body as any;
+  const input: string[] = body?.urls?.length ? body.urls : body?.url ? [body.url] : [];
   if (!input.length) {
     res.status(400).json({ error: "Provide 'url' or 'urls'" });
     return;
   }
-  const limited = input.slice(0, 10); // simple safety cap
-  const results = await Promise.all(limited.map((u) => scrapeOne(u)));
+  const options = body?.options || {};
+  const ua: string | undefined = options.userAgent;
+  const timeoutSec: number = Math.min(Math.max(Number(options.timeout) || 12, 5), 30);
+  const concurrency: number = Math.min(Math.max(Number(options.concurrency) || 4, 1), 10);
+
+  const limited = input.slice(0, 25);
+
+  const queue = [...limited];
+  const results: ScrapeItem[] = [];
+
+  async function worker() {
+    while (queue.length) {
+      const url = queue.shift()!;
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), timeoutSec * 1000);
+      try {
+        const r = await fetch(url, {
+          redirect: "follow",
+          signal: controller.signal,
+          headers: ua ? { "user-agent": ua } : undefined,
+        });
+        const status = r.status;
+        const type = r.headers.get("content-type") || "";
+        let text = "";
+        if (type.includes("text") || type.includes("html") || type.includes("xml")) {
+          text = await r.text();
+        }
+        clearTimeout(t);
+        if (!text) {
+          results.push({ url, success: true, status, title: undefined, textPreview: undefined, links: [], metadata: { contentType: type } });
+          continue;
+        }
+        const title = extractTitle(text) || extractMeta(text)["og:title"];
+        const preview = stripTags(text).slice(0, 3000);
+        const links = extractLinks(text, url);
+        const metadata = extractMeta(text);
+        results.push({ url, success: true, status, title, textPreview: preview, links, metadata });
+      } catch (e: any) {
+        results.push({ url, success: false, error: e?.message || "error" });
+      }
+    }
+  }
+
+  const workers = Array.from({ length: concurrency }, () => worker());
+  await Promise.all(workers);
+
   const payload: ScrapeResponse = { results };
   res.status(200).json(payload);
 };
