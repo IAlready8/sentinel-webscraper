@@ -23,6 +23,7 @@ function Header() {
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <NavItem to="/" label="Home" />
           <NavItem to="/dashboard" label="Dashboard" />
+          <NavItem to="/scraper" label="Scraper" />
         </nav>
         <div className="flex items-center gap-2">
           <Link to="/dashboard">
