@@ -56,6 +56,11 @@ export interface MetricsResponse {
 export interface ScrapeRequest {
   url?: string;
   urls?: string[];
+  options?: {
+    timeout?: number; // seconds
+    concurrency?: number;
+    userAgent?: string;
+  };
 }
 
 export interface ScrapeItem {
