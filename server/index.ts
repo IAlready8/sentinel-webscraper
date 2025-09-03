@@ -21,6 +21,7 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
   app.get("/api/metrics", handleMetrics);
+  app.post("/api/scrape", handleScrape);
 
   return app;
 }
