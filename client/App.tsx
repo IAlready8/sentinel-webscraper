@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { Layout } from "@/components/Layout";
 import Dashboard from "@/pages/Dashboard";
+import ScraperPage from "@/pages/Scraper";
 
 const queryClient = new QueryClient();
 
