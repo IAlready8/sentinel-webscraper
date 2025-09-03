@@ -37,6 +37,14 @@ const App = () => (
               </Layout>
             }
           />
+          <Route
+            path="/scraper"
+            element={
+              <Layout>
+                <ScraperPage />
+              </Layout>
+            }
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
