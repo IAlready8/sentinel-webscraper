@@ -1,7 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import type { MetricsResponse } from "@shared/api";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import type { MetricsResponse, ScrapeResponse, ScrapeItem } from "@shared/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   AreaChart,
   Area,
@@ -14,6 +18,7 @@ import {
   Line,
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 function useMetrics() {
   return useQuery<MetricsResponse>({
@@ -33,21 +38,125 @@ export default function Dashboard() {
   return (
     <div className="container py-8 md:py-10">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Live Analytics</h1>
+        <h1 className="text-2xl font-bold">Operations</h1>
         <Badge className="bg-primary/15 text-primary">Realtime</Badge>
       </div>
 
-      {isLoading || !data ? (
-        <LoadingState />
-      ) : (
-        <div className="space-y-8">
-          <SummaryCards data={data} />
-          <Charts data={data} />
-          <div className="grid gap-6 md:grid-cols-2">
-            <Proxies data={data} />
-            <Alerts data={data} />
-          </div>
-        </div>
+      <Tabs defaultValue="analytics" className="space-y-8">
+        <TabsList>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="scraper">Scraper</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="analytics">
+          {isLoading || !data ? (
+            <LoadingState />
+          ) : (
+            <div className="space-y-8">
+              <SummaryCards data={data} />
+              <Charts data={data} />
+              <div className="grid gap-6 md:grid-cols-2">
+                <Proxies data={data} />
+                <Alerts data={data} />
+              </div>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="scraper">
+          <ScraperPanel />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function ScraperPanel() {
+  const [urlsText, setUrlsText] = useState("");
+  const [results, setResults] = useState<ScrapeItem[] | null>(null);
+  const mutation = useMutation({
+    mutationFn: async (urls: string[]) => {
+      const res = await fetch("/api/scrape", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ urls }),
+      });
+      if (!res.ok) throw new Error("Scrape failed");
+      return (await res.json()) as ScrapeResponse;
+    },
+    onSuccess: (data) => setResults(data.results),
+  });
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const urls = urlsText
+      .split(/\n|,|\s+/)
+      .map((u) => u.trim())
+      .filter((u) => u.startsWith("http"));
+    if (urls.length) mutation.mutate(urls.slice(0, 10));
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Paste URLs to Scrape</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onSubmit} className="space-y-4">
+            <Textarea
+              value={urlsText}
+              onChange={(e) => setUrlsText(e.target.value)}
+              placeholder="https://example.com\nhttps://httpbin.org/html"
+              className="min-h-32"
+            />
+            <div className="flex items-center gap-3">
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? "Scraping..." : "Scrape"}
+              </Button>
+              <span className="text-sm text-foreground/60">Up to 10 URLs per run</span>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      {results && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {results.map((r) => (
+                <div key={r.url} className="rounded-lg border p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <a href={r.url} target="_blank" rel="noreferrer" className="font-medium text-primary underline-offset-4 hover:underline break-all">
+                      {r.title || r.url}
+                    </a>
+                    <span className={`text-xs ${r.success ? "text-emerald-600" : "text-rose-600"}`}>
+                      {r.success ? r.status : r.error}
+                    </span>
+                  </div>
+                  {r.textPreview && (
+                    <p className="mt-2 text-sm text-foreground/70 line-clamp-4 whitespace-pre-wrap">
+                      {r.textPreview}
+                    </p>
+                  )}
+                  {r.links && r.links.length > 0 && (
+                    <div className="mt-2 text-xs text-foreground/60">
+                      {r.links.slice(0, 3).map((l) => (
+                        <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="mr-3 underline-offset-4 hover:underline">
+                          {new URL(l.href).hostname}
+                        </a>
+                      ))}
+                      {r.links.length > 3 && <span>+{r.links.length - 3} more</span>}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
