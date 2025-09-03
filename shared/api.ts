@@ -52,3 +52,23 @@ export interface MetricsResponse {
   proxies: ProxyStat[];
   alerts: AlertItem[];
 }
+
+export interface ScrapeRequest {
+  url?: string;
+  urls?: string[];
+}
+
+export interface ScrapeItem {
+  url: string;
+  success: boolean;
+  status?: number;
+  title?: string;
+  textPreview?: string;
+  links?: { href: string; text?: string }[];
+  metadata?: Record<string, string>;
+  error?: string;
+}
+
+export interface ScrapeResponse {
+  results: ScrapeItem[];
+}
