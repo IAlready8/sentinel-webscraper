@@ -2,7 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import type { MetricsResponse } from "@shared/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, LineChart, Line } from "recharts";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+  LineChart,
+  Line,
+} from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function useMetrics() {
@@ -63,8 +73,14 @@ function LoadingState() {
 function SummaryCards({ data }: { data: MetricsResponse }) {
   const { summary } = data;
   const items = [
-    { label: "Requests (window)", value: Intl.NumberFormat().format(summary.total) },
-    { label: "Success rate", value: `${(summary.successRate * 100).toFixed(1)}%` },
+    {
+      label: "Requests (window)",
+      value: Intl.NumberFormat().format(summary.total),
+    },
+    {
+      label: "Success rate",
+      value: `${(summary.successRate * 100).toFixed(1)}%`,
+    },
     { label: "Avg response", value: `${summary.avgResponseTime.toFixed(2)}s` },
     { label: "p95 response", value: `${summary.p95ResponseTime.toFixed(2)}s` },
   ];
@@ -73,7 +89,9 @@ function SummaryCards({ data }: { data: MetricsResponse }) {
       {items.map((it) => (
         <Card key={it.label}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-foreground/70">{it.label}</CardTitle>
+            <CardTitle className="text-sm text-foreground/70">
+              {it.label}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">{it.value}</div>
@@ -86,7 +104,12 @@ function SummaryCards({ data }: { data: MetricsResponse }) {
 
 function Charts({ data }: { data: MetricsResponse }) {
   const series = data.series.map((p) => ({
-    time: new Date(p.t).toLocaleTimeString([], { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+    time: new Date(p.t).toLocaleTimeString([], {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }),
     total: p.total,
     success: p.success,
     failed: p.failed,
@@ -107,9 +130,30 @@ function Charts({ data }: { data: MetricsResponse }) {
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} name="Total" />
-              <Line type="monotone" dataKey="success" stroke="#22c55e" strokeWidth={2} dot={false} name="Success" />
-              <Line type="monotone" dataKey="failed" stroke="#ef4444" strokeWidth={2} dot={false} name="Failed" />
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2}
+                dot={false}
+                name="Total"
+              />
+              <Line
+                type="monotone"
+                dataKey="success"
+                stroke="#22c55e"
+                strokeWidth={2}
+                dot={false}
+                name="Success"
+              />
+              <Line
+                type="monotone"
+                dataKey="failed"
+                stroke="#ef4444"
+                strokeWidth={2}
+                dot={false}
+                name="Failed"
+              />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -124,8 +168,16 @@ function Charts({ data }: { data: MetricsResponse }) {
             <AreaChart data={series} margin={{ left: 10, right: 10 }}>
               <defs>
                 <linearGradient id="fillAvg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
+                  <stop
+                    offset="5%"
+                    stopColor="hsl(var(--primary))"
+                    stopOpacity={0.3}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="hsl(var(--primary))"
+                    stopOpacity={0.05}
+                  />
                 </linearGradient>
                 <linearGradient id="fillP95" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.25} />
@@ -136,8 +188,20 @@ function Charts({ data }: { data: MetricsResponse }) {
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
               <Legend />
-              <Area type="monotone" dataKey="avg" stroke="hsl(var(--primary))" fill="url(#fillAvg)" name="Avg" />
-              <Area type="monotone" dataKey="p95" stroke="#06b6d4" fill="url(#fillP95)" name="p95" />
+              <Area
+                type="monotone"
+                dataKey="avg"
+                stroke="hsl(var(--primary))"
+                fill="url(#fillAvg)"
+                name="Avg"
+              />
+              <Area
+                type="monotone"
+                dataKey="p95"
+                stroke="#06b6d4"
+                fill="url(#fillP95)"
+                name="p95"
+              />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
@@ -159,11 +223,21 @@ function Proxies({ data }: { data: MetricsResponse }) {
             <div key={p.proxy} className="rounded-lg border p-4">
               <div className="flex items-center justify-between">
                 <div className="font-medium">{p.proxy}</div>
-                <div className="text-sm text-foreground/60">{Math.round(p.health * 100)}%</div>
+                <div className="text-sm text-foreground/60">
+                  {Math.round(p.health * 100)}%
+                </div>
               </div>
-              <div className="mt-2 text-sm text-foreground/60">avg {p.avgResponse.toFixed(2)}s • {p.success} ok / {p.failure} fail</div>
+              <div className="mt-2 text-sm text-foreground/60">
+                avg {p.avgResponse.toFixed(2)}s • {p.success} ok / {p.failure}{" "}
+                fail
+              </div>
               <div className="mt-3 h-2 w-full rounded bg-secondary">
-                <div className="h-2 rounded bg-primary" style={{ width: `${Math.max(4, Math.round(p.health * 100))}%` }} />
+                <div
+                  className="h-2 rounded bg-primary"
+                  style={{
+                    width: `${Math.max(4, Math.round(p.health * 100))}%`,
+                  }}
+                />
               </div>
             </div>
           ))}
@@ -185,16 +259,28 @@ function Alerts({ data }: { data: MetricsResponse }) {
           <div className="text-sm text-foreground/60">No active alerts</div>
         ) : (
           <ul className="space-y-3">
-            {alerts.slice().reverse().map((a) => (
-              <li key={a.id} className="flex items-start gap-3 rounded-lg border p-3">
-                <span className={`mt-1 h-2 w-2 rounded-full ${a.severity === "critical" ? "bg-rose-500" : a.severity === "warning" ? "bg-amber-500" : "bg-emerald-500"}`} />
-                <div>
-                  <div className="text-sm font-medium">{a.type}</div>
-                  <div className="text-sm text-foreground/70">{a.message}</div>
-                  <div className="text-xs text-foreground/50">{new Date(a.timestamp).toLocaleTimeString()}</div>
-                </div>
-              </li>
-            ))}
+            {alerts
+              .slice()
+              .reverse()
+              .map((a) => (
+                <li
+                  key={a.id}
+                  className="flex items-start gap-3 rounded-lg border p-3"
+                >
+                  <span
+                    className={`mt-1 h-2 w-2 rounded-full ${a.severity === "critical" ? "bg-rose-500" : a.severity === "warning" ? "bg-amber-500" : "bg-emerald-500"}`}
+                  />
+                  <div>
+                    <div className="text-sm font-medium">{a.type}</div>
+                    <div className="text-sm text-foreground/70">
+                      {a.message}
+                    </div>
+                    <div className="text-xs text-foreground/50">
+                      {new Date(a.timestamp).toLocaleTimeString()}
+                    </div>
+                  </div>
+                </li>
+              ))}
           </ul>
         )}
       </CardContent>

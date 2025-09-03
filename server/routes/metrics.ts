@@ -1,5 +1,10 @@
 import type { RequestHandler } from "express";
-import type { MetricsResponse, TimePoint, ProxyStat, AlertItem } from "@shared/api";
+import type {
+  MetricsResponse,
+  TimePoint,
+  ProxyStat,
+  AlertItem,
+} from "@shared/api";
 
 let initialized = false;
 let series: TimePoint[] = [];
@@ -12,11 +17,41 @@ function init() {
   const now = Date.now();
   // Seed proxies
   proxies = [
-    { proxy: "proxy-a:8080", success: 0, failure: 0, avgResponse: 0.6, health: 0.98 },
-    { proxy: "proxy-b:8080", success: 0, failure: 0, avgResponse: 0.9, health: 0.92 },
-    { proxy: "proxy-c:8080", success: 0, failure: 0, avgResponse: 0.7, health: 0.96 },
-    { proxy: "proxy-d:8080", success: 0, failure: 0, avgResponse: 1.4, health: 0.82 },
-    { proxy: "proxy-e:8080", success: 0, failure: 0, avgResponse: 1.1, health: 0.88 },
+    {
+      proxy: "proxy-a:8080",
+      success: 0,
+      failure: 0,
+      avgResponse: 0.6,
+      health: 0.98,
+    },
+    {
+      proxy: "proxy-b:8080",
+      success: 0,
+      failure: 0,
+      avgResponse: 0.9,
+      health: 0.92,
+    },
+    {
+      proxy: "proxy-c:8080",
+      success: 0,
+      failure: 0,
+      avgResponse: 0.7,
+      health: 0.96,
+    },
+    {
+      proxy: "proxy-d:8080",
+      success: 0,
+      failure: 0,
+      avgResponse: 1.4,
+      health: 0.82,
+    },
+    {
+      proxy: "proxy-e:8080",
+      success: 0,
+      failure: 0,
+      avgResponse: 1.1,
+      health: 0.88,
+    },
   ];
   // Seed 60 points over last 10 minutes (10s interval)
   let total = 200;
@@ -58,7 +93,11 @@ function step() {
       success: p.success + (ok ? 1 : 0),
       failure: p.failure + (ok ? 0 : 1),
       avgResponse: latency,
-      health: clamp(1 - p.failure / Math.max(1, p.success + p.failure) - randn(0.0, 0.01), 0, 1),
+      health: clamp(
+        1 - p.failure / Math.max(1, p.success + p.failure) - randn(0.0, 0.01),
+        0,
+        1,
+      ),
     };
   });
 
@@ -69,7 +108,7 @@ function step() {
     newAlerts.push({
       id: `err-${now}`,
       type: "high_error_rate",
-      message: `Error rate ${(errRate * 100).toFixed(1)}% exceeds threshold` ,
+      message: `Error rate ${(errRate * 100).toFixed(1)}% exceeds threshold`,
       severity: errRate > 0.35 ? "critical" : "warning",
       timestamp: now,
     });

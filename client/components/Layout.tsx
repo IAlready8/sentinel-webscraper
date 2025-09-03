@@ -26,7 +26,9 @@ function Header() {
         </nav>
         <div className="flex items-center gap-2">
           <Link to="/dashboard">
-            <Button className="bg-primary text-primary-foreground hover:opacity-90">Open Dashboard</Button>
+            <Button className="bg-primary text-primary-foreground hover:opacity-90">
+              Open Dashboard
+            </Button>
           </Link>
         </div>
       </div>
@@ -60,8 +62,12 @@ function Footer() {
           <span>Enterprise-Grade Web Scraping System</span>
         </div>
         <div className="flex items-center gap-4">
-          <a className="hover:text-foreground/80" href="/dashboard">Status</a>
-          <a className="hover:text-foreground/80" href="/">Home</a>
+          <a className="hover:text-foreground/80" href="/dashboard">
+            Status
+          </a>
+          <a className="hover:text-foreground/80" href="/">
+            Home
+          </a>
         </div>
       </div>
     </footer>
@@ -71,8 +77,20 @@ function Footer() {
 function Logo({ small = false }: { small?: boolean }) {
   return (
     <div className="flex items-center gap-2">
-      <div className={cn("rounded-md bg-gradient-to-br from-primary to-accent", small ? "h-6 w-6" : "h-8 w-8")} />
-      <span className={cn("font-semibold tracking-tight", small ? "text-base" : "text-xl")}>Sentinel</span>
+      <div
+        className={cn(
+          "rounded-md bg-gradient-to-br from-primary to-accent",
+          small ? "h-6 w-6" : "h-8 w-8",
+        )}
+      />
+      <span
+        className={cn(
+          "font-semibold tracking-tight",
+          small ? "text-base" : "text-xl",
+        )}
+      >
+        Sentinel
+      </span>
     </div>
   );
 }
